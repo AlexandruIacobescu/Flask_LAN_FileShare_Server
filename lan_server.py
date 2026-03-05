@@ -54,6 +54,18 @@ def list_dir_entries(root: str, relpath: str = ""):
         '.html': '🌐',
         '.css': '🎨',
     }
+    # Add ".." entry if not in root directory
+    if relpath:
+        parent_relpath = os.path.dirname(relpath)
+        entries.append({
+            "name": "..",
+            "is_dir": True,
+            "icon": "📁",
+            "size": 0,
+            "size_str": "--",
+            "mtime": "",
+            "href": f"/browse/{parent_relpath}" if parent_relpath else "/"
+        })
     for entry in sorted(os.scandir(target), key=lambda e: (not e.is_dir(), e.name.lower())):
         st = entry.stat()
         icon = "📁" if entry.is_dir() else icons.get(Path(entry.name).suffix.lower(), "📄")
