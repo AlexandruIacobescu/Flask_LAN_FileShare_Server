@@ -30,11 +30,37 @@ def list_dir_entries(root: str, relpath: str = ""):
     """Return list of entries (files & dirs) for rendering."""
     target = safe_join(root, relpath) if relpath else root
     entries = []
+    icons = {
+        '.txt': '📄',
+        '.pdf': '📕',
+        '.doc': '📄',
+        '.docx': '📄',
+        '.xls': '📊',
+        '.xlsx': '📊',
+        '.ppt': '📽️',
+        '.pptx': '📽️',
+        '.jpg': '🖼️',
+        '.jpeg': '🖼️',
+        '.png': '🖼️',
+        '.gif': '🖼️',
+        '.mp4': '🎥',
+        '.avi': '🎥',
+        '.mp3': '🎵',
+        '.zip': '📦',
+        '.rar': '📦',
+        '.exe': '⚙️',
+        '.py': '🐍',
+        '.js': '🟨',
+        '.html': '🌐',
+        '.css': '🎨',
+    }
     for entry in sorted(os.scandir(target), key=lambda e: (not e.is_dir(), e.name.lower())):
         st = entry.stat()
+        icon = "📁" if entry.is_dir() else icons.get(Path(entry.name).suffix.lower(), "📄")
         entries.append({
             "name": entry.name,
             "is_dir": entry.is_dir(),
+            "icon": icon,
             "size": st.st_size,
             "size_str": format_size(st.st_size) if not entry.is_dir() else "--",
             "mtime": datetime.fromtimestamp(st.st_mtime).strftime("%Y-%m-%d %H:%M:%S"),
@@ -93,7 +119,7 @@ a:hover{text-decoration:underline}
     <tbody>
       {% for e in entries %}
       <tr class="row" data-name="{{ e.name|lower }}">
-        <td class="file-icon">{% if e.is_dir %}📁{% else %}📄{% endif %}</td>
+        <td class="file-icon">{{ e.icon }}</td>
         <td><a href="{{ e.href }}">{{ e.name }}</a></td>
         <td class="small">{{ e.mtime }}</td>
         <td class="small">{{ e.size_str }}</td>
